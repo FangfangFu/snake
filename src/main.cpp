@@ -24,6 +24,8 @@ int main()
     snake.setPosition(x, y);
     Player myplayer(x, y, START_DIRECTION);
 
+    sf::Clock clock;
+
     while (window.isOpen())
     {
         // Process events
@@ -60,7 +62,7 @@ int main()
     
         }
 
-        myplayer.UpdatePosition();
+        myplayer.UpdatePosition(clock.restart().asMilliseconds());
         x = ConvertToPixel(myplayer.GetPositionX());
         y = ConvertToPixel(myplayer.GetPositionY());
         snake.setPosition(x, y);

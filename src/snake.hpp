@@ -9,6 +9,8 @@ private:
     int startX;
     int startY;
     Direction startDirection;
+    float timeElapsed;
+    const float MOVE_TIME = 250.0f;
 
 public:
     //Constructor
@@ -29,16 +31,33 @@ public:
     const int GetPositionY(){
         return startY;
     }
-    void UpdatePosition(){
-        if (startDirection == Direction::UP){
-            startY -= 1;
-        }else if (startDirection == Direction::DOWN){
-            startY += 1;
-        }else if (startDirection == Direction::LEFT){
-            startX -= 1;
-        }else if (startDirection == Direction::RIGHT){
-            startX += 1;
+    void UpdatePosition(float elapsed){
+        timeElapsed += elapsed;
+        if (timeElapsed > MOVE_TIME){
+            if (startDirection == Direction::UP){
+                startY -= 1;
+                if(startY < 1){
+                    startY = 1;
+                }
+            }else if (startDirection == Direction::DOWN){
+                startY += 1;
+                if(startY > 13){
+                    startY = 13;
+                }
+            }else if (startDirection == Direction::LEFT){
+                startX -= 1;
+                if(startX < 1){
+                    startX = 1;
+                }
+            }else if (startDirection == Direction::RIGHT){
+                startX += 1;
+                if(startX > 18){
+                    startX = 18;
+                }
+            }
+            timeElapsed -= MOVE_TIME;
         }
+        
     }//This function should move the Player position by 1 for either X or Y based on the current Direction.
     
 
