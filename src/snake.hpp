@@ -8,7 +8,10 @@ class Player {
 private:
     int startX;
     int startY;
+    int originalX;
+    int originalY;
     Direction startDirection;
+    Direction originalDirection;
     float timeElapsed;
     const float MOVE_TIME = 250.0f;
 
@@ -17,7 +20,10 @@ public:
     Player(const int x, const int y, const Direction direction){
         startX = x;
         startY = y;
+        originalX = x;
+        originalY = y;
         startDirection = direction;
+        originalDirection = direction;
     }
     Direction GetDirection(){
         return startDirection;
@@ -31,35 +37,45 @@ public:
     const int GetPositionY(){
         return startY;
     }
-    void UpdatePosition(float elapsed){
+    bool UpdatePosition(float elapsed){
         timeElapsed += elapsed;
         if (timeElapsed > MOVE_TIME){
             if (startDirection == Direction::UP){
                 startY -= 1;
                 if(startY < 1){
-                    startY = 1;
+                    ResetPlayer();
+                    return true;
                 }
             }else if (startDirection == Direction::DOWN){
                 startY += 1;
                 if(startY > 13){
-                    startY = 13;
+                    ResetPlayer();
+                    return true;
                 }
             }else if (startDirection == Direction::LEFT){
                 startX -= 1;
                 if(startX < 1){
-                    startX = 1;
+                    ResetPlayer();
+                    return true;
                 }
             }else if (startDirection == Direction::RIGHT){
                 startX += 1;
                 if(startX > 18){
-                    startX = 18;
+                    ResetPlayer();
+                    return true;
                 }
             }
             timeElapsed -= MOVE_TIME;
+            return false;
         }
         
-    }//This function should move the Player position by 1 for either X or Y based on the current Direction.
-    
+    }
+
+    ResetPlayer(){
+        startX = originalX;
+        startY = originalY;
+        startDirection = originalDirection;
+    }
 
 };
 #endif //SNAKE_HPP

@@ -3,15 +3,20 @@
 #include <snake.hpp>
 #include <utility.hpp>
 #include <iostream>
+#include <cstdlib>
+#include <ctime>
+#include <random>
 
 const int START_POSITION_X = 7;
 const int START_POSITION_Y = 5;
 const Direction START_DIRECTION = Direction::RIGHT;
+const int APPLE_START_X = 15;
+const int APPLE_START_Y = 7;
 int main()
 {
     // Create the main window
     sf::RenderWindow window(sf::VideoMode(1280, 960), "Snake window");
-    // Load a sprite to display
+    // Create a rectangle snake to display
     sf::RectangleShape rectangle(sf::Vector2f(1280, 960));
     rectangle.setFillColor(sf::Color::Transparent);
     rectangle.setOutlineThickness(-64);
@@ -21,10 +26,18 @@ int main()
     snake.setFillColor(sf::Color::Green);
     int x = START_POSITION_X;
     int y = START_POSITION_Y;
-    snake.setPosition(x, y);
     Player myplayer(x, y, START_DIRECTION);
-
     sf::Clock clock;
+
+    sf::Texture texture;
+    if (!texture.loadFromFile("../data/apple.png")){
+        std::cout << "error" << std::endl;
+    }
+    sf::Sprite sprite;
+    sprite.setTexture(texture);
+    int a = APPLE_START_X;
+    int b = APPLE_START_Y;
+    
 
     while (window.isOpen())
     {
@@ -50,9 +63,7 @@ int main()
                     } else if (event.key.code == sf::Keyboard::Right){
                         myplayer.SetDirection(Direction::RIGHT);
                     }
-                    
 
-                        
                     break;
 
                 // we don't process other types of events
@@ -61,11 +72,23 @@ int main()
             }
     
         }
-
-        myplayer.UpdatePosition(clock.restart().asMilliseconds());
+        
+        bool hitWall = myplayer.UpdatePosition(clock.restart().asMilliseconds());
+        if (hitWall == true){
+            a = APPLE_START_X;
+            b = APPLE_START_Y;
+        }
+        
         x = ConvertToPixel(myplayer.GetPositionX());
         y = ConvertToPixel(myplayer.GetPositionY());
         snake.setPosition(x, y);
+        
+        if (ConvertToGameCoordinate(x) == a & ConvertToGameCoordinate(y) == b){
+            srand (time(NULL));
+            a = rand() % 18 + 1;
+            b = rand() % 13 + 1;
+        }
+        sprite.setPosition(ConvertToPixel(a), ConvertToPixel(b));
         
 
         // Clear screen
@@ -74,6 +97,8 @@ int main()
         window.draw(rectangle);
         // Draw the green square snake
         window.draw(snake);
+        // Draw the sprite of apple
+        window.draw(sprite);
         // Update the window
         window.display();
     }
