@@ -6,6 +6,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <random>
+#include <deque>
 
 const int START_POSITION_X = 7;
 const int START_POSITION_Y = 5;
@@ -22,19 +23,20 @@ int main()
     rectangle.setOutlineThickness(-64);
     rectangle.setOutlineColor(sf::Color::Blue);
 
-    sf::RectangleShape snake(sf::Vector2f(64, 64));
-    snake.setFillColor(sf::Color::Green);
+    sf::RectangleShape square(sf::Vector2f(64, 64));
+    square.setFillColor(sf::Color::Green);
     int x = START_POSITION_X;
     int y = START_POSITION_Y;
-    Player myplayer(x, y, START_DIRECTION);
+
+    Player snake(x, y, START_DIRECTION);
     sf::Clock clock;
 
     sf::Texture texture;
     if (!texture.loadFromFile("../data/apple.png")){
-        std::cout << "error" << std::endl;
+        return EXIT_FAILURE;
     }
-    sf::Sprite sprite;
-    sprite.setTexture(texture);
+    sf::Sprite apple;
+    apple.setTexture(texture);
     int a = APPLE_START_X;
     int b = APPLE_START_Y;
     
@@ -55,13 +57,13 @@ int main()
                 // key pressed
                 case sf::Event::KeyPressed:
                     if (event.key.code == sf::Keyboard::Up){
-                        myplayer.SetDirection(Direction::UP);
+                        snake.SetDirection(Direction::UP);
                     } else if (event.key.code == sf::Keyboard::Down){
-                        myplayer.SetDirection(Direction::DOWN);
+                        snake.SetDirection(Direction::DOWN);
                     } else if (event.key.code == sf::Keyboard::Left){
-                        myplayer.SetDirection(Direction::LEFT);
+                        snake.SetDirection(Direction::LEFT);
                     } else if (event.key.code == sf::Keyboard::Right){
-                        myplayer.SetDirection(Direction::RIGHT);
+                        snake.SetDirection(Direction::RIGHT);
                     }
 
                     break;
@@ -73,22 +75,26 @@ int main()
     
         }
         
-        bool hitWall = myplayer.UpdatePosition(clock.restart().asMilliseconds());
-        if (hitWall == true){
+        bool collision = snake.UpdatePosition(clock.restart().asMilliseconds());
+        if (collision == true){
             a = APPLE_START_X;
             b = APPLE_START_Y;
         }
+        std::deque<Position> queue = snake.GetPositions();
+        int queueSize = queue.size();
+        //std::vector<square> squareVector;
         
-        x = ConvertToPixel(myplayer.GetPositionX());
-        y = ConvertToPixel(myplayer.GetPositionY());
-        snake.setPosition(x, y);
+        x = snake.GetPositionX();
+        y = snake.GetPositionY();
         
-        if (ConvertToGameCoordinate(x) == a & ConvertToGameCoordinate(y) == b){
+        if (x == a & y == b){
+            snake.IncrementLength();
+
             srand (time(NULL));
             a = rand() % 18 + 1;
-            b = rand() % 13 + 1;
+            b = rand() % 13 + 1;   
         }
-        sprite.setPosition(ConvertToPixel(a), ConvertToPixel(b));
+        apple.setPosition(ConvertToPixel(a), ConvertToPixel(b));
         
 
         // Clear screen
@@ -96,9 +102,12 @@ int main()
         // Draw the rectangle
         window.draw(rectangle);
         // Draw the green square snake
-        window.draw(snake);
+        for (int i = 0; i < queueSize; ++i){
+            square.setPosition(ConvertToPixel(queue[i].x), ConvertToPixel(queue[i].y));
+            window.draw(square);
+        }
         // Draw the sprite of apple
-        window.draw(sprite);
+        window.draw(apple);
         // Update the window
         window.display();
     }
