@@ -19,14 +19,14 @@ private:
     Direction startDirection;
     Direction originalDirection;
     float timeElapsed;
-    const float MOVE_TIME = 150.0f;
+    const float MOVE_TIME;
     int length;
     std::deque<Position> queue;
     Position position;
 
 public:
     //Constructor
-    Player(const int x, const int y, const Direction direction){
+    Player(const int x, const int y, const Direction direction, const float move_time) : MOVE_TIME(move_time) {
         startX = x;
         startY = y;
         originalX = x;
@@ -36,6 +36,7 @@ public:
         length = 1;
         position.x = x;
         position.y = y;
+        queue.push_front(position);
     }
     Direction GetDirection(){
         return startDirection;
@@ -51,34 +52,36 @@ public:
         return startY;
     }
 
-    bool UpdatePosition(float elapsed){
+    bool UpdatePosition(float elapsed, float multiple){
         timeElapsed += elapsed;
         if (timeElapsed > MOVE_TIME){
             if (startDirection == Direction::UP){
                 startY -= 1;
                 position.y = startY;
-                if(startY < 1){
+                if(startY < static_cast<int>(1 * multiple)){
                     ResetPlayer();
                     return true;
                 }
             }else if (startDirection == Direction::DOWN){
                 startY += 1;
                 position.y = startY;
-                if(startY > 13){
+                if(startY > static_cast<int>((15-1) * multiple - 1)){
+                    //std::cout << "Condition for snake Y is fine" << std::endl;
                     ResetPlayer();
                     return true;
                 }
             }else if (startDirection == Direction::LEFT){
                 startX -= 1;
                 position.x = startX;
-                if(startX < 1){
+                if(startX < static_cast<int>(1 * multiple)){
                     ResetPlayer();
                     return true;
                 }
             }else if (startDirection == Direction::RIGHT){
                 startX += 1;
                 position.x = startX;
-                if(startX > 18){
+                if(startX > static_cast<int>((20-1) * multiple - 1)){
+                    //std::cout << "Condition for snake X is fine" << std::endl;
                     ResetPlayer();
                     return true;
                 }

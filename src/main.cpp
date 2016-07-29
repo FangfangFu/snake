@@ -7,14 +7,36 @@
 #include <ctime>
 #include <random>
 #include <deque>
+#include <string>
 
 const int START_POSITION_X = 7;
 const int START_POSITION_Y = 5;
 const Direction START_DIRECTION = Direction::RIGHT;
 const int APPLE_START_X = 15;
 const int APPLE_START_Y = 7;
-int main()
+const int WIDTH = 20;
+const int HEIGHT = 15;
+const float MOVE_TIME = 150.0f;
+
+int main(int nNumberofArgs, char* args[])
 {
+    int height = HEIGHT;
+    float multiple = 1.0f;
+    
+    float move_time = MOVE_TIME;
+    int width = WIDTH;
+    // Check first argument
+    if (nNumberofArgs >= 2) {
+        width = std::atoi(args[1]);
+        multiple = width/WIDTH;
+        height = static_cast<int>(height * multiple);
+    } 
+    
+    // Check second argument
+    if (nNumberofArgs == 3) {
+        move_time = std::atof(args[2]);
+    }
+    
     // Create the main window
     sf::RenderWindow window(sf::VideoMode(1280, 960), "Snake window");
     // Create a rectangle snake to display
@@ -23,12 +45,13 @@ int main()
     rectangle.setOutlineThickness(-64);
     rectangle.setOutlineColor(sf::Color::Blue);
 
-    sf::RectangleShape square(sf::Vector2f(64, 64));
+    sf::RectangleShape square(sf::Vector2f(64/multiple, 64/multiple));
     square.setFillColor(sf::Color::Green);
-    int x = START_POSITION_X;
-    int y = START_POSITION_Y;
 
-    Player snake(x, y, START_DIRECTION);
+    int x = START_POSITION_X * multiple;
+    int y = START_POSITION_Y * multiple;
+    // Define Player snake
+    Player snake(x, y, START_DIRECTION, move_time);
     sf::Clock clock;
 
     sf::Texture texture;
@@ -37,10 +60,11 @@ int main()
     }
     sf::Sprite apple;
     apple.setTexture(texture);
-    int a = APPLE_START_X;
-    int b = APPLE_START_Y;
+    int a = APPLE_START_X * multiple;
+    int b = APPLE_START_Y * multiple;
+    apple.setScale(1/multiple, 1/multiple);
+    //std::cout << "Resize Apple Code" << std::endl;
     
-
     while (window.isOpen())
     {
         // Process events
@@ -75,10 +99,13 @@ int main()
     
         }
         
-        bool collision = snake.UpdatePosition(clock.restart().asMilliseconds());
+        bool collision = snake.UpdatePosition(clock.restart().asMilliseconds(), multiple);
+        //std::cout << "Update position is fine" << std::endl;
         if (collision == true){
-            a = APPLE_START_X;
-            b = APPLE_START_Y;
+            a = APPLE_START_X * multiple;
+            //std::cout << "Reset apple X position" << std::endl;
+            b = APPLE_START_Y * multiple;
+            //std::cout << "Reset apple Y position" << std::endl;
         }
         std::deque<Position> queue = snake.GetPositions();
         int queueSize = queue.size();
@@ -91,11 +118,16 @@ int main()
             snake.IncrementLength();
 
             srand (time(NULL));
-            a = rand() % 18 + 1;
-            b = rand() % 13 + 1;   
+            a = rand() % static_cast<int>(18 * multiple) + 1 * multiple;
+            //std::cout << "Find the random position for Apple X" << std::endl;
+            b = rand() % static_cast<int>(13 * multiple) + 1 * multiple; 
+            //std::cout << "Find the random position for Apple Y" << std::endl;  
         }
-        apple.setPosition(ConvertToPixel(a), ConvertToPixel(b));
-        
+
+        int appleX = static_cast<int>(ConvertToPixel(a)/multiple);
+        int appleY = static_cast<int>(ConvertToPixel(b)/multiple);
+        apple.setPosition(appleX, appleY);
+        //std::cout << "Set up position for apple" << std::endl;
 
         // Clear screen
         window.clear(sf::Color::White);
@@ -103,7 +135,8 @@ int main()
         window.draw(rectangle);
         // Draw the green square snake
         for (int i = 0; i < queueSize; ++i){
-            square.setPosition(ConvertToPixel(queue[i].x), ConvertToPixel(queue[i].y));
+            square.setPosition(static_cast<int>(ConvertToPixel(queue[i].x)/multiple), static_cast<int>(ConvertToPixel(queue[i].y)/multiple));
+            //std::cout << "Set up position for Snake square" << std::endl;
             window.draw(square);
         }
         // Draw the sprite of apple

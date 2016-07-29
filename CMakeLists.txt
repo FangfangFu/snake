@@ -5,7 +5,7 @@ include_directories(SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/include)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 #Add -mwindows to remove console window
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -o3 -mwindows")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -o3")
 
 set(SOURCE_FILES src/main.cpp)
 add_executable(SnakeFu ${SOURCE_FILES})
