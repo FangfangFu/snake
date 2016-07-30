@@ -11,7 +11,7 @@ You can choose what different grib and move time; both of them decides the diffi
 ![20-grid 250-ms](https://github.com/FangfangFu/Snake/blob/master/doc/snake2.PNG) 
 ![40-grid 100-ms](https://github.com/FangfangFu/Snake/blob/master/doc/snake3.PNG)
 
-# Documentation
+## Documentation
 ------------------------------------------
 
 Snake is heavily documented and uses the Github Wiki as the base for all documentation, including how to build the project and understanding the source code.
