@@ -28,7 +28,7 @@ int main(int nNumberofArgs, char* args[])
     // Check first argument
     if (nNumberofArgs >= 2) {
         width = std::atoi(args[1]);
-        multiple = width/WIDTH;
+        multiple = static_cast<float>(width)/static_cast<float>(WIDTH);
         height = static_cast<int>(height * multiple);
     } 
     
