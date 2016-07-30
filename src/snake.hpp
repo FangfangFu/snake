@@ -4,12 +4,14 @@
 #include <cstdlib>
 #include <iostream>
 #include <deque>
-
+// Enum class for direction types
 enum class Direction {UP, DOWN, LEFT, RIGHT};
+// A stuct for position coordinate
 struct Position {
     int x;
     int y;
 };
+// A player class
 class Player {
 private:
     int startX;
@@ -38,12 +40,15 @@ public:
         position.y = y;
         queue.push_front(position);
     }
+
     Direction GetDirection(){
         return startDirection;
     }
+
     void SetDirection(const Direction direction) {
         startDirection = direction;   
     }
+
     const int GetPositionX(){
         return startX;
     }
@@ -66,7 +71,6 @@ public:
                 startY += 1;
                 position.y = startY;
                 if(startY > static_cast<int>((15-1) * multiple - 1)){
-                    //std::cout << "Condition for snake Y is fine" << std::endl;
                     ResetPlayer();
                     return true;
                 }
@@ -81,7 +85,6 @@ public:
                 startX += 1;
                 position.x = startX;
                 if(startX > static_cast<int>((20-1) * multiple - 1)){
-                    //std::cout << "Condition for snake X is fine" << std::endl;
                     ResetPlayer();
                     return true;
                 }
@@ -101,7 +104,6 @@ public:
             }
             return false;
         }
-        
     }
 
     ResetPlayer(){
@@ -114,12 +116,11 @@ public:
         queue.clear();
         queue.push_front(position);
     }
-
-    
+    // Return a queue of positions for latter drawing squares
     std::deque<Position> GetPositions(){
         return queue;
     }
-    
+   //Record the snake length 
     IncrementLength(){
         ++length;
     }

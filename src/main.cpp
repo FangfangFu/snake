@@ -1,3 +1,4 @@
+// This program is about snake eating apple and growing longer; it dies if snake eats itself or hit the wall
 #include <SFML/Audio.hpp>
 #include <SFML/Graphics.hpp>
 #include <snake.hpp>
@@ -9,14 +10,14 @@
 #include <deque>
 #include <string>
 
-const int START_POSITION_X = 7;
-const int START_POSITION_Y = 5;
-const Direction START_DIRECTION = Direction::RIGHT;
-const int APPLE_START_X = 15;
-const int APPLE_START_Y = 7;
-const int WIDTH = 20;
-const int HEIGHT = 15;
-const float MOVE_TIME = 150.0f;
+const int START_POSITION_X = 7;                        // Snake initial x-axis position
+const int START_POSITION_Y = 5;                        // Snake initial y-axis position
+const Direction START_DIRECTION = Direction::RIGHT;    // Snake initial moving direction
+const int APPLE_START_X = 15;                          // Apple initial x-axis position
+const int APPLE_START_Y = 7;                           // Apple initial y-axis position
+const int WIDTH = 20;                                  // Default x axis length in game coordinate
+const int HEIGHT = 15;                                 // Default y axis length in game coordinate
+const float MOVE_TIME = 150.0f;                        // Default move time for moving 1 game unit
 
 int main(int nNumberofArgs, char* args[])
 {
@@ -39,32 +40,34 @@ int main(int nNumberofArgs, char* args[])
     
     // Create the main window
     sf::RenderWindow window(sf::VideoMode(1280, 960), "Snake window");
-    // Create a rectangle snake to display
+    // Create a rectangle window to display
     sf::RectangleShape rectangle(sf::Vector2f(1280, 960));
     rectangle.setFillColor(sf::Color::Transparent);
     rectangle.setOutlineThickness(-64);
     rectangle.setOutlineColor(sf::Color::Blue);
-
+    // Create a green square element of a snake
     sf::RectangleShape square(sf::Vector2f(64/multiple, 64/multiple));
     square.setFillColor(sf::Color::Green);
-
+    // Start position for snake
     int x = START_POSITION_X * multiple;
     int y = START_POSITION_Y * multiple;
     // Define Player snake
     Player snake(x, y, START_DIRECTION, move_time);
     sf::Clock clock;
-
+    // Upload a texture of an apple
     sf::Texture texture;
     if (!texture.loadFromFile("../data/apple.png")){
         return EXIT_FAILURE;
     }
+    // Create a apple sprite with that apple texture
     sf::Sprite apple;
     apple.setTexture(texture);
+    apple.setScale(1/multiple, 1/multiple);
+    // Initial position for apple
     int a = APPLE_START_X * multiple;
     int b = APPLE_START_Y * multiple;
-    apple.setScale(1/multiple, 1/multiple);
-    //std::cout << "Resize Apple Code" << std::endl;
     
+    //Window loop
     while (window.isOpen())
     {
         // Process events
@@ -89,45 +92,38 @@ int main(int nNumberofArgs, char* args[])
                     } else if (event.key.code == sf::Keyboard::Right){
                         snake.SetDirection(Direction::RIGHT);
                     }
-
                     break;
 
                 // we don't process other types of events
                 default:
                     break;
             }
-    
         }
-        
+        // When snake hits the wall or eats itself, the game will restart
         bool collision = snake.UpdatePosition(clock.restart().asMilliseconds(), multiple);
-        //std::cout << "Update position is fine" << std::endl;
         if (collision == true){
             a = APPLE_START_X * multiple;
-            //std::cout << "Reset apple X position" << std::endl;
             b = APPLE_START_Y * multiple;
-            //std::cout << "Reset apple Y position" << std::endl;
         }
+        // Get a queue of squares to prepare for latter snake drawing
         std::deque<Position> queue = snake.GetPositions();
         int queueSize = queue.size();
-        //std::vector<square> squareVector;
         
         x = snake.GetPositionX();
         y = snake.GetPositionY();
         
+        // When the apple is eaten, the snake becomes longer and apple would be randomly reput
         if (x == a & y == b){
             snake.IncrementLength();
 
             srand (time(NULL));
             a = rand() % static_cast<int>(18 * multiple) + 1 * multiple;
-            //std::cout << "Find the random position for Apple X" << std::endl;
-            b = rand() % static_cast<int>(13 * multiple) + 1 * multiple; 
-            //std::cout << "Find the random position for Apple Y" << std::endl;  
+            b = rand() % static_cast<int>(13 * multiple) + 1 * multiple;   
         }
-
+        // Set up apple position for each iteration
         int appleX = static_cast<int>(ConvertToPixel(a)/multiple);
         int appleY = static_cast<int>(ConvertToPixel(b)/multiple);
         apple.setPosition(appleX, appleY);
-        //std::cout << "Set up position for apple" << std::endl;
 
         // Clear screen
         window.clear(sf::Color::White);
@@ -136,7 +132,6 @@ int main(int nNumberofArgs, char* args[])
         // Draw the green square snake
         for (int i = 0; i < queueSize; ++i){
             square.setPosition(static_cast<int>(ConvertToPixel(queue[i].x)/multiple), static_cast<int>(ConvertToPixel(queue[i].y)/multiple));
-            //std::cout << "Set up position for Snake square" << std::endl;
             window.draw(square);
         }
         // Draw the sprite of apple
